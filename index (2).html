@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NGS İK (Tam Sığdırma)</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';</script>
+
+    <style>
+        /* --- GLOBAL STYLES --- */
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        .navbar { background: #2c3e50; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .nav-brand { font-weight: bold; font-size: 1.1rem; }
+        .nav-btn { background: #34495e; border: 1px solid #7f8c8d; color: white; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-size: 0.9rem; }
+        .screen { display: none; padding: 15px; height: 100%; box-sizing: border-box; overflow-y: auto; }
+        .active-screen { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        .form-container, .admin-container { max-width: 850px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .section-header { background: #f8f9fa; padding: 10px; font-weight: bold; color: #2c3e50; border-left: 5px solid #0056b3; margin-top: 25px; margin-bottom: 15px; text-transform: uppercase; font-size: 0.9rem; }
+        .form-row { display: flex; gap: 20px; margin-bottom: 15px; }
+        .form-group { flex: 1; display: flex; flex-direction: column; }
+        label { font-size: 0.85rem; font-weight: 600; color: #555; margin-bottom: 6px; }
+        input[type="text"], input[type="date"], select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; width: 100%; box-sizing: border-box; }
+        input[type="file"] { padding: 10px; background: #f9f9f9; border: 1px dashed #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 15px; background: #27ae60; color: white; font-weight: bold; border: none; cursor: pointer; font-size: 1.1rem; margin-top: 30px; border-radius: 6px; }
+        .submit-btn:disabled { background: #95a5a6; cursor: wait; }
+        @media (max-width: 768px) { .form-row { flex-direction: column; gap: 15px; } .form-container { padding: 15px; margin-top: 10px; } }
+        table.admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
+        table.admin-table th { background: #34495e; color: white; padding: 10px; text-align: left; }
+        table.admin-table td { padding: 10px; border-bottom: 1px solid #eee; }
+        .action-btn { background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px; }
+        .delete-btn { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+
+        /* --- PDF GENERATOR STYLES --- */
+        #pdf-generator-zone { position: absolute; left: -9999px; top: 0; }
+        
+        .pdf-page { 
+            width: 210mm; 
+            height: 296mm; 
+            padding: 10mm; 
+            background: white; 
+            position: relative; 
+            overflow: hidden; 
+            box-sizing: border-box; 
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Page 1 Table */
+        table.pdf-table { width: 100%; border-collapse: collapse; border: 2px solid black; table-layout: fixed; }
+        table.pdf-table td { border: 1px solid black; padding: 3px; font-size: 10px; font-weight: bold; vertical-align: middle; height: 18px; overflow: hidden; white-space: nowrap; }
+        .gray-bg { background-color: #d0cece; text-align: center; }
+        .photo-area { background-color: white; text-align: center; vertical-align: top !important; padding: 0; }
+        .user-input { font-weight: normal; font-family: 'Courier New', monospace; text-transform: uppercase; margin-left: 5px; font-size: 10px; }
+        .logo-img { height: 35px; display: block; margin: auto; }
+        #out_photo_img { width: 100%; height: 150px; object-fit: cover; }
+
+        /* ATTACHMENT PAGES (Absolute Centering Fix) */
+        .page-header { text-align:center; font-weight:bold; font-size:16px; border-bottom:2px solid black; margin-bottom:15px; padding-bottom:5px; }
+        
+        .att-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-bottom: 20px;
+        }
+
+        .att-big-box {
+            flex: 1; 
+            border: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            background: #fafafa;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .att-label { 
+            background: #eee; 
+            font-size: 12px; 
+            font-weight: bold; 
+            padding: 8px; 
+            text-align: center; 
+            border-bottom: 1px solid #ddd; 
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        
+        /* STRICT IMAGE CONTAINER */
+        .att-content { 
+            flex-grow: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        /* FORCE IMAGE CENTER & FIT */
+        .att-content img { 
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Perfectly center */
+            max-width: 95%;  /* Leave 5% breathing room */
+            max-height: 95%; /* Leave 5% breathing room */
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-brand">NGS İK (V3 Perfect Fit)</div>
+        <div>
+            <button class="nav-btn" onclick="showScreen('client-screen')">Form</button>
+            <button class="nav-btn" onclick="checkAdmin()">Admin</button>
+        </div>
+    </div>
+
+    <div id="client-screen" class="screen active-screen">
+        <div class="form-container">
+            <h2 style="color:#2c3e50; border-bottom:2px solid #eee; padding-bottom:10px;">İş Başvuru Formu</h2>
+            <form id="appForm">
+                <div class="section-header">1. Fotoğraf ve Pozisyon</div>
+                <div class="form-row"><div class="form-group"><label>Vesikalık Fotoğraf</label><input type="file" id="in_photo" accept="image/*"></div><div class="form-group"><label>Başvurulan Pozisyon</label><input type="text" id="in_pozisyon" placeholder="Örn: Garson"></div></div>
+                <div class="section-header">2. Kişisel Bilgiler</div>
+                <div class="form-row"><div class="form-group"><label>Adı</label><input type="text" id="in_ad"></div><div class="form-group"><label>Soyadı</label><input type="text" id="in_soyad"></div></div>
+                <div class="form-row"><div class="form-group"><label>Boy-Kilo</label><input type="text" id="in_boy_kilo"></div><div class="form-group"><label>Uyruğu</label><input type="text" id="in_uyruk"></div></div>
+                <div class="form-row"><div class="form-group"><label>Telefon</label><input type="text" id="in_tel"></div><div class="form-group"><label>E-Mail</label><input type="text" id="in_email"></div></div>
+                <div class="form-row"><div class="form-group"><label>Anne Adı</label><input type="text" id="in_anne"></div><div class="form-group"><label>Baba Adı</label><input type="text" id="in_baba"></div></div>
+                <div class="form-row"><div class="form-group"><label>Medeni Durum</label><input type="text" id="in_medeni"></div><div class="form-group"><label>Doğum Yeri</label><input type="text" id="in_dogum_yeri"></div></div>
+                <div class="form-group"><label>Doğum Tarihi</label><input type="date" id="in_dogum_tarih"></div>
+                <div class="form-group"><label>Adres</label><input type="text" id="in_adres"></div>
+                <div class="form-group"><label>Evli ise Eşinin Adı</label><input type="text" id="in_es"></div>
+                <div class="section-header">3. Eğitim ve Deneyim</div>
+                <div class="form-row"><div class="form-group"><label>Okul 1</label><input type="text" id="in_edu1_school"></div><div class="form-group"><label>Bölüm</label><input type="text" id="in_edu1_dept"></div></div>
+                <div class="form-row"><div class="form-group"><label>Ülke</label><input type="text" id="in_edu1_country"></div><div class="form-group"><label>Bitiş</label><input type="text" id="in_edu1_date"></div></div>
+                <div class="form-row"><div class="form-group"><label>Okul 2</label><input type="text" id="in_edu2_school"></div><div class="form-group"><label>Bölüm</label><input type="text" id="in_edu2_dept"></div></div>
+                <div class="form-row"><div class="form-group"><label>İş Yeri 1</label><input type="text" id="in_exp1_comp"></div><div class="form-group"><label>Pozisyon</label><input type="text" id="in_exp1_pos"></div></div>
+                <div class="form-row"><div class="form-group"><label>Başlangıç</label><input type="text" id="in_exp1_start"></div><div class="form-group"><label>Bitiş</label><input type="text" id="in_exp1_end"></div></div>
+                <div class="form-row"><div class="form-group"><label>İş Yeri 2</label><input type="text" id="in_exp2_comp"></div><div class="form-group"><label>Pozisyon</label><input type="text" id="in_exp2_pos"></div></div>
+                <div class="section-header">4. Yetenekler</div>
+                <div class="form-row"><div class="form-group"><label>Dil</label><input type="text" id="in_lang1_name"></div><div class="form-group"><label>Seviye</label><input type="text" id="in_lang1_lvl"></div></div>
+                <div class="form-group"><label>Yetenekler</label><input type="text" id="in_skills"></div>
+                <div class="form-group"><label>Sabıka Kaydı</label><input type="text" id="in_sabika"></div>
+                <div class="form-group"><label>Kronik Hastalık</label><input type="text" id="in_hastalik"></div>
+                <div class="section-header" style="background:#fff3cd; border-left-color:#ffc107;">5. Belge Yükleme (Tam Görünüm)</div>
+                <div class="form-row"><div class="form-group"><label>1. Pasaport</label><input type="file" id="in_passport_img" accept="image/*"></div><div class="form-group"><label>2. Tam Boy Foto</label><input type="file" id="in_fullbody_img" accept="image/*"></div></div>
+                <div class="form-row"><div class="form-group"><label>3. Diploma (Lise 1)</label><input type="file" id="in_diploma_img" accept="image/*, application/pdf"></div><div class="form-group"><label>4. Lise 2 / Transkript</label><input type="file" id="in_diploma2_img" accept="image/*, application/pdf"></div></div>
+                <div class="form-row"><div class="form-group"><label>5. Ehliyet</label><input type="file" id="in_driver_img" accept="image/*"></div><div class="form-group"><label>6. Sertifika</label><input type="file" id="in_cert_img" accept="image/*, application/pdf"></div></div>
+                <button type="button" class="submit-btn" id="submitBtn">BAŞVURUYU GÖNDER</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="admin-screen" class="screen">
+        <div class="admin-container">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>Yönetici Paneli</h2>
+                <div>
+                    <button onclick="loadFromFirebase()" style="background:#3498db; color:white; border:none; padding:8px 12px; cursor:pointer; border-radius:4px;">Yenile</button>
+                    <button onclick="logout()" style="background:#95a5a6; color:white; border:none; padding:8px 12px; cursor:pointer; border-radius:4px;">Çıkış</button>
+                </div>
+            </div>
+            <table class="admin-table">
+                <thead><tr><th>Tarih</th><th>Ad Soyad</th><th>Pozisyon</th><th>İşlem</th></tr></thead>
+                <tbody id="admin-table-body">
+                    <tr><td colspan="4" style="text-align:center; color:#777;">Yükleniyor...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="pdf-generator-zone">
+        <div id="print-container">
+            
+            <div class="pdf-page" id="page-1">
+                <div style="text-align:right; font-size:10px; font-weight:bold; margin-bottom:5px;">Tarih: <span id="out_today"></span></div>
+                <table class="pdf-table">
+                    <tr><td colspan="4" rowspan="2" class="logo-cell" style="width:30%;"><img src="ngs.png" class="logo-img"><div style="font-size:7px; color:#0056b3; font-weight:bold; text-align:center;">İNSAN KAYNAKLARI</div></td><td colspan="4" class="header-title">İŞ BAŞVURU FORMU</td><td colspan="2" rowspan="2" class="logo-cell" style="width:20%;"><img src="ngs1.png" class="logo-img"></td><td colspan="2" rowspan="9" class="photo-area" style="width:20%;"><img id="out_photo_img" src=""><span id="p_txt" style="display:block; margin-top:50px; font-size:10px;">FOTO</span></td></tr><tr></tr><tr><td colspan="10" style="font-size:8px; font-weight:normal;">1. Lütfen başvurunuza tam boyutlu fotoğrafınızı ekleyin.<br>2. Lütfen başvurduğunuz pozisyonu belirtiniz.</td></tr><tr><td colspan="3">BAŞVURULAN POZİSYON</td><td colspan="7"><span class="user-input" id="out_pozisyon"></span></td></tr><tr><td colspan="10" class="gray-bg">KİŞİSEL BİLGİLER</td></tr><tr><td colspan="2">ADI</td><td colspan="3"><span class="user-input" id="out_ad"></span></td><td colspan="2">SOYADI</td><td colspan="3"><span class="user-input" id="out_soyad"></span></td></tr><tr><td colspan="2">BOY-KİLO</td><td colspan="3"><span class="user-input" id="out_boy_kilo"></span></td><td colspan="2">UYRUĞU</td><td colspan="3"><span class="user-input" id="out_uyruk"></span></td></tr><tr><td colspan="2">TELEFON</td><td colspan="3"><span class="user-input" id="out_tel"></span></td><td colspan="2">E-MAIL</td><td colspan="3"><span class="user-input" id="out_email"></span></td></tr><tr><td colspan="2">ANNE ADI</td><td colspan="3"><span class="user-input" id="out_anne"></span></td><td colspan="2">BABA ADI</td><td colspan="3"><span class="user-input" id="out_baba"></span></td></tr><tr><td colspan="2">MEDENİ DURUM</td><td colspan="3"><span class="user-input" id="out_medeni"></span></td><td colspan="2">DOĞUM YERİ</td><td colspan="2"><span class="user-input" id="out_dogum_yeri"></span></td><td style="font-size:8px;">DOĞUM TARİHİ</td><td><span class="user-input" id="out_dogum_tarih"></span></td></tr><tr><td colspan="2">ADRES</td><td colspan="10"><span class="user-input" id="out_adres"></span></td></tr><tr><td colspan="2" style="font-size:8px;">EVLİ İSE EŞİNİN ADI...</td><td colspan="10"><span class="user-input" id="out_es"></span></td></tr><tr><td colspan="12" class="gray-bg">EĞİTİM</td></tr><tr style="text-align:center;"><td colspan="3">BİTİŞ TARİHİ</td><td colspan="3">OKUL</td><td colspan="3">BÖLÜM</td><td colspan="3">ÜLKE</td></tr><tr><td colspan="3"><span class="user-input" id="out_edu1_date"></span></td><td colspan="3"><span class="user-input" id="out_edu1_school"></span></td><td colspan="3"><span class="user-input" id="out_edu1_dept"></span></td><td colspan="3"><span class="user-input" id="out_edu1_country"></span></td></tr><tr><td colspan="3"></td><td colspan="3"><span class="user-input" id="out_edu2_school"></span></td><td colspan="3"><span class="user-input" id="out_edu2_dept"></span></td><td colspan="3"></td></tr><tr><td colspan="12" class="gray-bg">İŞ DENEYİMLERİ</td></tr><tr style="text-align:center;"><td colspan="2">BAŞLANGIÇ</td><td colspan="2">BİTİŞ</td><td colspan="3">İŞ VEREN</td><td colspan="3">POZİSYON</td><td colspan="2">ÜLKE</td></tr><tr><td colspan="2"><span class="user-input" id="out_exp1_start"></span></td><td colspan="2"><span class="user-input" id="out_exp1_end"></span></td><td colspan="3"><span class="user-input" id="out_exp1_comp"></span></td><td colspan="3"><span class="user-input" id="out_exp1_pos"></span></td><td colspan="2"></td></tr><tr><td colspan="2"></td><td colspan="2"></td><td colspan="3"><span class="user-input" id="out_exp2_comp"></span></td><td colspan="3"><span class="user-input" id="out_exp2_pos"></span></td><td colspan="2"></td></tr><tr><td colspan="12" class="gray-bg">DİL VE YETENEKLER</td></tr><tr style="text-align:center;"><td colspan="2">DİL</td><td colspan="2">KONUŞMA</td><td colspan="2">OKUMA</td><td colspan="2">YAZMA</td><td colspan="4">YETENEKLER</td></tr><tr><td colspan="2"><span class="user-input" id="out_lang1_name"></span></td><td colspan="2"><span class="user-input" id="out_lang1_lvl"></span></td><td colspan="2"></td><td colspan="2"></td><td colspan="4" rowspan="2" style="vertical-align:top;"><span class="user-input" id="out_skills"></span></td></tr><tr><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td></tr><tr><td colspan="12" class="gray-bg">DİĞER BİLGİLER</td></tr><tr><td colspan="3">SABIKA KAYDI</td><td colspan="9"><span class="user-input" id="out_sabika"></span></td></tr><tr><td colspan="3">SAĞLIK</td><td colspan="9"><span class="user-input" id="out_hastalik"></span></td></tr><tr><td colspan="12" class="gray-bg">KURSLAR</td></tr><tr><td colspan="12" style="height:20px;"></td></tr><tr><td colspan="12" style="height:20px;"></td></tr>
+                </table>
+                <div style="font-size:8px; margin-top:5px; text-align:justify;">Bu formda tarafımdan sağlanan bilgilerin eksiksiz ve doğru olduğunu beyan ederim.</div>
+                <div class="signature-box">AD SOYAD / İMZA</div>
+            </div>
+
+            <div class="pdf-page" id="page-2">
+                <div class="page-header">EKLER (1 / 3)</div>
+                <div class="att-container">
+                    <div class="att-big-box"><div class="att-label">1. PASAPORT</div><div class="att-content"><img id="out_passport_img"></div></div>
+                    <div class="att-big-box"><div class="att-label">2. TAM BOY FOTOĞRAF</div><div class="att-content"><img id="out_fullbody_img"></div></div>
+                </div>
+            </div>
+
+            <div class="pdf-page" id="page-3">
+                <div class="page-header">EKLER (2 / 3)</div>
+                <div class="att-container">
+                    <div class="att-big-box"><div class="att-label">3. LİSE DİPLOMASI (1)</div><div class="att-content" id="out_diploma_container"></div></div>
+                    <div class="att-big-box"><div class="att-label">4. LİSE (2) / TRANSKRİPT</div><div class="att-content" id="out_diploma2_container"></div></div>
+                </div>
+            </div>
+
+            <div class="pdf-page" id="page-4">
+                <div class="page-header">EKLER (3 / 3)</div>
+                <div class="att-container">
+                    <div class="att-big-box"><div class="att-label">5. EHLİYET</div><div class="att-content"><img id="out_driver_img"></div></div>
+                    <div class="att-big-box"><div class="att-label">6. SERTİFİKA</div><div class="att-content" id="out_cert_container"></div></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZM0I_QchjXgw-eAbds2nm3JvcrYPLr9A",
+            authDomain: "ngs-system-97961.firebaseapp.com",
+            projectId: "ngs-system-97961",
+            storageBucket: "ngs-system-97961.firebasestorage.app",
+            messagingSenderId: "65980395830",
+            appId: "1:65980395830:web:00949c5054e028bed30397",
+            measurementId: "G-MCYJFH6D6K"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        window.allApplications = [];
+
+        window.checkAdmin = function() {
+            if(sessionStorage.getItem('isAdmin') === 'true') { showScreen('admin-screen'); loadFromFirebase(); return; }
+            const pass = prompt("Yönetici Şifresi:");
+            if(pass === "admin123") { sessionStorage.setItem('isAdmin', 'true'); showScreen('admin-screen'); loadFromFirebase(); } 
+            else { alert("Hatalı Şifre!"); }
+        };
+        window.logout = function() { sessionStorage.removeItem('isAdmin'); showScreen('client-screen'); };
+        window.showScreen = function(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            document.getElementById(screenId).classList.add('active-screen');
+        };
+
+        // --- SUBMIT ---
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerText = "Yükleniyor... Lütfen Bekleyiniz.";
+
+            try {
+                const textIds = ['in_pozisyon', 'in_ad', 'in_soyad', 'in_boy_kilo', 'in_uyruk', 'in_tel', 'in_email', 'in_anne', 'in_baba', 'in_medeni', 'in_dogum_yeri', 'in_dogum_tarih', 'in_adres', 'in_es', 'in_edu1_school', 'in_edu1_dept', 'in_edu1_country', 'in_edu1_date', 'in_edu2_school', 'in_edu2_dept', 'in_exp1_comp', 'in_exp1_pos', 'in_exp1_start', 'in_exp1_end', 'in_exp2_comp', 'in_exp2_pos', 'in_lang1_name', 'in_lang1_lvl', 'in_skills', 'in_sabika', 'in_hastalik'];
+                let mainData = {};
+                textIds.forEach(id => mainData[id] = document.getElementById(id).value);
+
+                const photoArr = await handleFile(document.getElementById('in_photo').files[0]);
+                const passArr = await handleFile(document.getElementById('in_passport_img').files[0]);
+                const fullArr = await handleFile(document.getElementById('in_fullbody_img').files[0]);
+                const dipArr = await handleFile(document.getElementById('in_diploma_img').files[0]);
+                const dip2Arr = await handleFile(document.getElementById('in_diploma2_img').files[0]);
+                const drvArr = await handleFile(document.getElementById('in_driver_img').files[0]);
+                const certArr = await handleFile(document.getElementById('in_cert_img').files[0]);
+
+                const submissionId = Date.now().toString() + Math.floor(Math.random()*1000);
+                const dateStr = new Date().toLocaleDateString('tr-TR');
+
+                await addDoc(collection(db, "applications_main"), { submissionId, type: "main", date: dateStr, data: mainData });
+                
+                if(photoArr || passArr) await addDoc(collection(db, "applications_img1"), { submissionId, photo: photoArr?photoArr[0]:null, passport: passArr?passArr[0]:null });
+                if(fullArr || drvArr) await addDoc(collection(db, "applications_img2"), { submissionId, fullbody: fullArr?fullArr[0]:null, driver: drvArr?drvArr[0]:null });
+                if(dipArr || dip2Arr || certArr) await addDoc(collection(db, "applications_img3"), { submissionId, diploma: dipArr, diploma2: dip2Arr, cert: certArr });
+
+                alert("✅ Başvuru Başarıyla Gönderildi!");
+                document.getElementById('appForm').reset();
+            } catch (e) {
+                console.error(e);
+                alert("HATA: Bağlantı hatası.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "BAŞVURUYU GÖNDER";
+            }
+        });
+
+        // --- LOAD ---
+        window.loadFromFirebase = async function() {
+            const tbody = document.getElementById('admin-table-body');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Yükleniyor...</td></tr>';
+            window.allApplications = [];
+            
+            try {
+                const q = query(collection(db, "applications_main"));
+                const querySnapshot = await getDocs(q);
+                tbody.innerHTML = '';
+                if(querySnapshot.empty) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Kayıt Yok.</td></tr>'; return; }
+
+                querySnapshot.forEach((doc) => {
+                    const app = doc.data();
+                    window.allApplications.push(app);
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${app.date}</td><td>${app.data.in_ad} ${app.data.in_soyad}</td><td>${app.data.in_pozisyon}</td>
+                        <td><button class="action-btn" onclick="getFullDataAndRender('${app.submissionId}')">PDF İNDİR</button> 
+                        <button class="delete-btn" onclick="deleteAllParts('${app.submissionId}')">SİL</button></td>`;
+                    tbody.appendChild(tr);
+                });
+            } catch(e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Veri çekilemedi.</td></tr>';
+            }
+        };
+
+        window.getFullDataAndRender = async function(submissionId) {
+            const btn = document.activeElement;
+            const oldText = btn.innerText;
+            btn.innerText = "İndiriliyor...";
+            btn.disabled = true;
+
+            try {
+                const mainApp = window.allApplications.find(a => a.submissionId === submissionId);
+                let combinedData = { ...mainApp.data };
+
+                const p1 = getDocs(query(collection(db, "applications_img1"), where("submissionId", "==", submissionId)));
+                const p2 = getDocs(query(collection(db, "applications_img2"), where("submissionId", "==", submissionId)));
+                const p3 = getDocs(query(collection(db, "applications_img3"), where("submissionId", "==", submissionId)));
+                const [snap1, snap2, snap3] = await Promise.all([p1, p2, p3]);
+
+                snap1.forEach(d => { const dt = d.data(); if(dt.photo) combinedData.photo = dt.photo; if(dt.passport) combinedData.passport = dt.passport; });
+                snap2.forEach(d => { const dt = d.data(); if(dt.fullbody) combinedData.fullbody = dt.fullbody; if(dt.driver) combinedData.driver = dt.driver; });
+                snap3.forEach(d => { const dt = d.data(); if(dt.diploma) combinedData.diplomaPages = dt.diploma; if(dt.diploma2) combinedData.diploma2Pages = dt.diploma2; if(dt.cert) combinedData.certPages = dt.cert; });
+
+                generatePDF(combinedData, mainApp.date);
+
+            } catch(e) {
+                alert("Hata: " + e.message);
+            } finally {
+                btn.innerText = oldText;
+                btn.disabled = false;
+            }
+        };
+
+        window.deleteAllParts = async function(submissionId) {
+            if(!confirm("Kalıcı olarak silinsin mi?")) return;
+            const collections = ["applications_main", "applications_img1", "applications_img2", "applications_img3"];
+            try {
+                for(const colName of collections) {
+                    const snap = await getDocs(query(collection(db, colName), where("submissionId", "==", submissionId)));
+                    const batch = writeBatch(db);
+                    snap.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
+                }
+                loadFromFirebase();
+            } catch(e) { alert("Silme hatası: " + e.message); }
+        };
+
+        async function handleFile(file) {
+            if (!file) return null;
+            if (file.type.startsWith('image/')) return compressImage(file);
+            if (file.type === 'application/pdf') return convertPdfToImages(file);
+            return null;
+        }
+
+        function compressImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX = 1600; 
+                        let w = img.width, h = img.height;
+                        if(w>h) { if(w>MAX){ h*=MAX/w; w=MAX; }} else { if(h>MAX){ w*=MAX/h; h=MAX; }}
+                        canvas.width=w; canvas.height=h;
+                        ctx.drawImage(img,0,0,w,h);
+                        resolve([canvas.toDataURL('image/jpeg', 0.8)]);
+                    };
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function convertPdfToImages(file) {
+            const arr = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument(arr).promise;
+            const images = [];
+            const max = Math.min(pdf.numPages, 1);
+            for(let i=1; i<=max; i++){
+                const page = await pdf.getPage(i);
+                const vp = page.getViewport({scale:1.5});
+                const c = document.createElement('canvas');
+                c.width=vp.width; c.height=vp.height;
+                await page.render({canvasContext:c.getContext('2d'), viewport:vp}).promise;
+                images.push(c.toDataURL('image/jpeg', 0.8));
+            }
+            return images;
+        }
+
+        function generatePDF(data, dateStr) {
+            const map = {
+                'in_pozisyon': 'out_pozisyon', 'in_ad': 'out_ad', 'in_soyad': 'out_soyad', 'in_boy_kilo': 'out_boy_kilo',
+                'in_uyruk': 'out_uyruk', 'in_tel': 'out_tel', 'in_email': 'out_email', 'in_anne': 'out_anne', 'in_baba': 'out_baba',
+                'in_medeni': 'out_medeni', 'in_dogum_yeri': 'out_dogum_yeri', 'in_adres': 'out_adres', 'in_es': 'out_es',
+                'in_sabika': 'out_sabika', 'in_hastalik': 'out_hastalik', 'in_edu1_school': 'out_edu1_school',
+                'in_edu1_dept': 'out_edu1_dept', 'in_edu1_country': 'out_edu1_country', 'in_edu1_date': 'out_edu1_date',
+                'in_edu2_school': 'out_edu2_school', 'in_edu2_dept': 'out_edu2_dept', 'in_exp1_comp': 'out_exp1_comp',
+                'in_exp1_pos': 'out_exp1_pos', 'in_exp1_start': 'out_exp1_start', 'in_exp1_end': 'out_exp1_end',
+                'in_exp2_comp': 'out_exp2_comp', 'in_exp2_pos': 'out_exp2_pos', 'in_lang1_name': 'out_lang1_name',
+                'in_lang1_lvl': 'out_lang1_lvl', 'in_skills': 'out_skills'
+            };
+            for(let key in map) if(data[key]) document.getElementById(map[key]).innerText = data[key];
+
+            if(data.in_dogum_tarih) {
+                const d = new Date(data.in_dogum_tarih);
+                if(!isNaN(d)) document.getElementById('out_dogum_tarih').innerText = `${("0"+d.getDate()).slice(-2)}.${("0"+(d.getMonth()+1)).slice(-2)}.${d.getFullYear()}`;
+            }
+            document.getElementById('out_today').innerText = dateStr;
+
+            // CLEAR
+            document.getElementById('out_photo_img').style.display='none'; document.getElementById('p_txt').style.display='block';
+            document.getElementById('out_passport_img').src=''; document.getElementById('out_fullbody_img').src=''; document.getElementById('out_driver_img').src='';
+            ['out_diploma_container','out_diploma2_container','out_cert_container'].forEach(id => document.getElementById(id).innerHTML='');
+
+            if(data.photo) { document.getElementById('out_photo_img').src=data.photo; document.getElementById('out_photo_img').style.display='block'; document.getElementById('p_txt').style.display='none'; }
+            if(data.passport) document.getElementById('out_passport_img').src=data.passport;
+            if(data.fullbody) document.getElementById('out_fullbody_img').src=data.fullbody;
+            if(data.driver) document.getElementById('out_driver_img').src=data.driver;
+
+            const fill = (id, arr) => { if(arr && arr.length>0) arr.forEach(src => { const i = document.createElement('img'); i.src=src; document.getElementById(id).appendChild(i); }) };
+            fill('out_diploma_container', data.diplomaPages);
+            fill('out_diploma2_container', data.diploma2Pages);
+            fill('out_cert_container', data.certPages);
+
+            // --- CRITICAL: HIGH SCALE RENDER ---
+            const opt = { 
+                margin: 0, 
+                filename: `Basvuru_${data.in_ad}.pdf`, 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 4, useCORS: true }, 
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+            };
+            html2pdf().set(opt).from(document.getElementById('print-container')).save();
+        }
+    </script>
+</body>
+</html>
