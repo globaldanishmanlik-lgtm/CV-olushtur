@@ -285,9 +285,9 @@
                 alert("✅ Başvuru Başarıyla Gönderildi!");
                 document.getElementById('appForm').reset();
             } catch (e) {
-                console.error(e);
-                alert("HATA: Bağlantı hatası.");
-            } finally {
+    console.error(e);
+    alert(e.message);
+} finally {
                 btn.disabled = false;
                 btn.innerText = "BAŞVURUYU GÖNDER";
             }
@@ -488,6 +488,7 @@ async function convertPdfToImagesHQ(file) {
     </script>
 </body>
 </html>
+
 
 
 
