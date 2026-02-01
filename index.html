@@ -363,12 +363,29 @@
             } catch(e) { alert("Silme hatası: " + e.message); }
         };
 
-        async function handleFile(file) {
-            if (!file) return null;
-            if (file.type.startsWith('image/')) return compressImage(file);
-            if (file.type === 'application/pdf') return convertPdfToImages(file);
-            return null;
+        async function handleFile(file, type = "photo") {
+    if (!file) return null;
+
+    if (file.type.startsWith('image/')) {
+        if (type === "document") {
+            return readImageOriginal(file);
         }
+        return compressImage(file);
+    }
+
+    if (file.type === 'application/pdf') {
+        return convertPdfToImagesHQ(file);
+    }
+
+    return null;
+}   function readImageOriginal(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve([e.target.result]);
+        reader.readAsDataURL(file);
+    });
+}
+
 
         function compressImage(file) {
             return new Promise((resolve) => {
@@ -453,25 +470,25 @@ async function convertPdfToImagesHQ(file) {
             fill('out_cert_container', data.certPages);
 
             // --- CRITICAL: HIGH SCALE RENDER ---
-            const opt = { 
-                margin: 0, 
-                filename: `Basvuru_${data.in_ad}.pdf`, 
-                image: { type: 'jpeg', quality: 1 }
- 
-html2canvas: {
-    scale: 5,
-    dpi: 300,
-    letterRendering: true,
-    useCORS: true
-}
- 
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-            };
+           const opt = { 
+    margin: 0, 
+    filename: `Basvuru_${data.in_ad}.pdf`, 
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: {
+        scale: 5,
+        dpi: 300,
+        letterRendering: true,
+        useCORS: true
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+};
+
             html2pdf().set(opt).from(document.getElementById('print-container')).save();
         }
     </script>
 </body>
 </html>
+
 
 
 
