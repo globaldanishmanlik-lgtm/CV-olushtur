@@ -3,65 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Global Danishmanlik</title>
+    <title>NGS İK (Admin Onarım)</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';</script>
 
     <style>
-        /* --- TASARIM --- */
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
-        .navbar { background: #2c3e50; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .nav-brand { font-weight: bold; font-size: 1.1rem; }
-        .nav-btn { background: #34495e; border: 1px solid #7f8c8d; color: white; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-size: 0.9rem; }
-        .screen { display: none; padding: 15px; height: 100%; box-sizing: border-box; overflow-y: auto; }
-        .active-screen { display: block; animation: fadeIn 0.4s; }
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-        .form-container, .admin-container { max-width: 850px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .section-header { background: #f8f9fa; padding: 10px; font-weight: bold; color: #2c3e50; border-left: 5px solid #0056b3; margin-top: 25px; margin-bottom: 15px; text-transform: uppercase; font-size: 0.9rem; }
+        body { font-family: 'Arial', sans-serif; background: #f4f6f9; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        .navbar { background: #1a252f; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .nav-brand { font-weight: bold; font-size: 1.2rem; letter-spacing: 0.5px; }
+        .nav-btn { background: #34495e; border: 1px solid #5d6d7e; color: white; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-size: 0.9rem; transition: 0.2s; }
+        .nav-btn:hover { background: #2c3e50; }
+        
+        .screen { display: none; padding: 20px; height: 100%; box-sizing: border-box; overflow-y: auto; }
+        .active-screen { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity:0; transform: translateY(5px); } to { opacity:1; transform: translateY(0); } }
+
+        .form-container, .admin-container { max-width: 900px; margin: 0 auto; background: white; padding: 35px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        
+        /* Form & Admin */
+        .section-header { background: #eef2f7; padding: 12px; font-weight: bold; color: #2c3e50; border-left: 5px solid #3498db; margin-top: 30px; margin-bottom: 20px; text-transform: uppercase; font-size: 0.95rem; }
         .form-row { display: flex; gap: 20px; margin-bottom: 15px; }
         .form-group { flex: 1; display: flex; flex-direction: column; }
-        label { font-size: 0.85rem; font-weight: 600; color: #555; margin-bottom: 6px; }
-        input[type="text"], input[type="date"], select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; width: 100%; box-sizing: border-box; }
-        input[type="file"] { padding: 10px; background: #f9f9f9; border: 1px dashed #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; }
-        .submit-btn { width: 100%; padding: 15px; background: #27ae60; color: white; font-weight: bold; border: none; cursor: pointer; font-size: 1.1rem; margin-top: 30px; border-radius: 6px; }
-        .submit-btn:disabled { background: #95a5a6; cursor: wait; }
-        @media (max-width: 768px) { .form-row { flex-direction: column; gap: 15px; } .form-container { padding: 15px; margin-top: 10px; } }
+        label { font-size: 0.9rem; font-weight: 700; color: #444; margin-bottom: 8px; }
+        input[type="text"], input[type="date"], select { padding: 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1rem; width: 100%; box-sizing: border-box; transition: 0.3s; }
+        input[type="file"] { padding: 10px; background: #f8f9fa; border: 2px dashed #ced4da; border-radius: 6px; width: 100%; box-sizing: border-box; }
         
-        /* Admin Tablosu */
-        table.admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
-        table.admin-table th { background: #34495e; color: white; padding: 10px; text-align: left; }
-        table.admin-table td { padding: 10px; border-bottom: 1px solid #eee; }
-        .action-btn { background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px; }
-        .delete-btn { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .submit-btn { width: 100%; padding: 16px; background: #27ae60; color: white; font-weight: bold; border: none; cursor: pointer; font-size: 1.1rem; margin-top: 35px; border-radius: 6px; transition: 0.2s; }
+        .submit-btn:hover { background: #219150; }
+        .submit-btn:disabled { background: #95a5a6; cursor: wait; }
 
-        /* --- PDF ŞABLONU --- */
+        @media (max-width: 768px) { .form-row { flex-direction: column; gap: 15px; } .form-container { padding: 20px; } }
+
+        /* Admin Table */
+        table.admin-table { width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 0.95rem; }
+        table.admin-table th { background: #2c3e50; color: white; padding: 12px; text-align: left; border-radius: 5px 5px 0 0; }
+        table.admin-table td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        .action-btn { background: #3498db; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px; font-size: 0.85rem; }
+        .delete-btn { background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+
+        /* PDF Styles - CLEAN DESIGN */
         #pdf-generator-zone { position: absolute; left: -9999px; top: 0; }
         .pdf-page { width: 210mm; height: 296mm; padding: 10mm; background: white; position: relative; overflow: hidden; box-sizing: border-box; page-break-after: always; display: flex; flex-direction: column; }
         
-        /* Tablo Stilleri */
-        table.pdf-table { width: 100%; border-collapse: collapse; border: 2px solid black; table-layout: fixed; }
-        table.pdf-table td { border: 1px solid black; padding: 3px; font-size: 10px; font-weight: bold; vertical-align: middle; height: 18px; overflow: hidden; white-space: nowrap; }
+        table.pdf-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; }
+        table.pdf-table td { border: 1px solid #000; padding: 4px; font-size: 10px; font-weight: 700; vertical-align: middle; height: 18px; overflow: hidden; white-space: nowrap; color: #000; font-family: 'Arial', sans-serif; }
         .gray-bg { background-color: #d0cece; text-align: center; }
         .photo-area { background-color: white; text-align: center; vertical-align: top !important; padding: 0; }
-        .user-input { font-weight: normal; font-family: 'Courier New', monospace; text-transform: uppercase; margin-left: 5px; font-size: 10px; }
+        .user-input { font-weight: 900; font-family: 'Arial', sans-serif; text-transform: uppercase; margin-left: 5px; font-size: 11px; color: #000; }
         .logo-img { height: 35px; display: block; margin: auto; }
         #out_photo_img { width: 100%; height: 150px; object-fit: cover; }
 
-        /* Ek Belgeler Düzeni (Tam Sığdırma) */
-        .page-header { text-align:center; font-weight:bold; font-size:16px; border-bottom:2px solid black; margin-bottom:15px; padding-bottom:5px; }
-        .att-container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 15px; padding-bottom: 20px; }
-        .att-big-box { flex: 1; border: 1px solid #ccc; display: flex; flex-direction: column; background: #fafafa; overflow: hidden; position: relative; }
-        .att-label { background: #eee; font-size: 12px; font-weight: bold; padding: 8px; text-align: center; border-bottom: 1px solid #ddd; flex-shrink: 0; z-index: 10; }
+        /* Attachment Page (No Borders, Clean) */
+        .page-header { text-align:center; font-weight:900; font-size:18px; border-bottom:3px solid #000; margin-bottom:20px; padding-bottom:5px; color: #000; }
+        .att-container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 20px; padding-bottom: 20px; }
+        .att-big-box { flex: 1; border: none; display: flex; flex-direction: column; background: white; overflow: hidden; position: relative; }
+        .att-label { background: white; font-size: 14px; font-weight: 900; padding: 5px 0; text-align: left; border-bottom: 2px solid #000; color: #000; margin-bottom: 10px; flex-shrink: 0; }
         .att-content { flex-grow: 1; position: relative; width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .att-content img { max-width: 95%; max-height: 95%; width: auto; height: auto; object-fit: contain; display: block; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+        .att-content img { max-width: 98%; max-height: 98%; width: auto; height: auto; object-fit: contain; display: block; box-shadow: none; border: none; }
     </style>
 </head>
 <body>
 
     <div class="navbar">
-        <div class="nav-brand">Global Danishmanlik</div>
+        <div class="nav-brand">NGS İK (Admin Fix)</div>
         <div>
             <button class="nav-btn" onclick="showScreen('client-screen')">Form</button>
             <button class="nav-btn" onclick="checkAdmin()">Admin</button>
@@ -95,7 +101,7 @@
                 <div class="form-group"><label>Yetenekler</label><input type="text" id="in_skills"></div>
                 <div class="form-group"><label>Sabıka Kaydı</label><input type="text" id="in_sabika"></div>
                 <div class="form-group"><label>Kronik Hastalık</label><input type="text" id="in_hastalik"></div>
-                <div class="section-header" style="background:#fff3cd; border-left-color:#ffc107;">5. Belge Yükleme (HD Kalite)</div>
+                <div class="section-header" style="background:#fff3cd; border-left-color:#ffc107;">5. Belge Yükleme (Kalın & Net)</div>
                 <div class="form-row"><div class="form-group"><label>1. Pasaport</label><input type="file" id="in_passport_img" accept="image/*"></div><div class="form-group"><label>2. Tam Boy Foto</label><input type="file" id="in_fullbody_img" accept="image/*"></div></div>
                 <div class="form-row"><div class="form-group"><label>3. Diploma (Lise 1)</label><input type="file" id="in_diploma_img" accept="image/*, application/pdf"></div><div class="form-group"><label>4. Lise 2 / Transkript</label><input type="file" id="in_diploma2_img" accept="image/*, application/pdf"></div></div>
                 <div class="form-row"><div class="form-group"><label>5. Ehliyet</label><input type="file" id="in_driver_img" accept="image/*"></div><div class="form-group"><label>6. Sertifika</label><input type="file" id="in_cert_img" accept="image/*, application/pdf"></div></div>
@@ -109,13 +115,15 @@
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h2>Yönetici Paneli</h2>
                 <div>
-                    <button onclick="loadFromFirebase()" style="background:#3498db; color:white; border:none; padding:8px 12px; cursor:pointer; border-radius:4px;">Yenile</button>
-                    <button onclick="logout()" style="background:#95a5a6; color:white; border:none; padding:8px 12px; cursor:pointer; border-radius:4px;">Çıkış</button>
+                    <button onclick="loadFromFirebase()" style="background:#3498db; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:4px; font-weight:bold;">YENİLE</button>
+                    <button onclick="logout()" style="background:#95a5a6; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:4px;">ÇIKIŞ</button>
                 </div>
             </div>
             <table class="admin-table">
                 <thead><tr><th>Tarih</th><th>Ad Soyad</th><th>Pozisyon</th><th>İşlem</th></tr></thead>
-                <tbody id="admin-table-body"><tr><td colspan="4">Yükleniyor...</td></tr></tbody>
+                <tbody id="admin-table-body">
+                    <tr><td colspan="4" style="text-align:center;">Yükleniyor...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -125,9 +133,9 @@
             <div class="pdf-page" id="page-1">
                 <div style="text-align:right; font-size:10px; font-weight:bold; margin-bottom:5px;">Tarih: <span id="out_today"></span></div>
                 <table class="pdf-table">
-                    <tr><td colspan="4" rowspan="2" class="logo-cell" style="width:30%;"><img src="ngs.png" class="logo-img"><div style="font-size:7px; color:#0056b3; font-weight:bold; text-align:center;">İNSAN KAYNAKLARI</div></td><td colspan="4" class="header-title">İŞ BAŞVURU FORMU</td><td colspan="2" rowspan="2" class="logo-cell" style="width:20%;"><img src="ngs1.png" class="logo-img"></td><td colspan="2" rowspan="9" class="photo-area" style="width:20%;"><img id="out_photo_img" src=""><span id="p_txt" style="display:block; margin-top:50px; font-size:10px;">FOTO</span></td></tr><tr></tr><tr><td colspan="10" style="font-size:8px; font-weight:normal;">1. Lütfen başvurunuza tam boyutlu fotoğrafınızı ekleyin.<br>2. Lütfen başvurduğunuz pozisyonu belirtiniz.</td></tr><tr><td colspan="3">BAŞVURULAN POZİSYON</td><td colspan="7"><span class="user-input" id="out_pozisyon"></span></td></tr><tr><td colspan="10" class="gray-bg">KİŞİSEL BİLGİLER</td></tr><tr><td colspan="2">ADI</td><td colspan="3"><span class="user-input" id="out_ad"></span></td><td colspan="2">SOYADI</td><td colspan="3"><span class="user-input" id="out_soyad"></span></td></tr><tr><td colspan="2">BOY-KİLO</td><td colspan="3"><span class="user-input" id="out_boy_kilo"></span></td><td colspan="2">UYRUĞU</td><td colspan="3"><span class="user-input" id="out_uyruk"></span></td></tr><tr><td colspan="2">TELEFON</td><td colspan="3"><span class="user-input" id="out_tel"></span></td><td colspan="2">E-MAIL</td><td colspan="3"><span class="user-input" id="out_email"></span></td></tr><tr><td colspan="2">ANNE ADI</td><td colspan="3"><span class="user-input" id="out_anne"></span></td><td colspan="2">BABA ADI</td><td colspan="3"><span class="user-input" id="out_baba"></span></td></tr><tr><td colspan="2">MEDENİ DURUM</td><td colspan="3"><span class="user-input" id="out_medeni"></span></td><td colspan="2">DOĞUM YERİ</td><td colspan="2"><span class="user-input" id="out_dogum_yeri"></span></td><td style="font-size:8px;">DOĞUM TARİHİ</td><td><span class="user-input" id="out_dogum_tarih"></span></td></tr><tr><td colspan="2">ADRES</td><td colspan="10"><span class="user-input" id="out_adres"></span></td></tr><tr><td colspan="2" style="font-size:8px;">EVLİ İSE EŞİNİN ADI...</td><td colspan="10"><span class="user-input" id="out_es"></span></td></tr><tr><td colspan="12" class="gray-bg">EĞİTİM</td></tr><tr style="text-align:center;"><td colspan="3">BİTİŞ TARİHİ</td><td colspan="3">OKUL</td><td colspan="3">BÖLÜM</td><td colspan="3">ÜLKE</td></tr><tr><td colspan="3"><span class="user-input" id="out_edu1_date"></span></td><td colspan="3"><span class="user-input" id="out_edu1_school"></span></td><td colspan="3"><span class="user-input" id="out_edu1_dept"></span></td><td colspan="3"><span class="user-input" id="out_edu1_country"></span></td></tr><tr><td colspan="3"></td><td colspan="3"><span class="user-input" id="out_edu2_school"></span></td><td colspan="3"><span class="user-input" id="out_edu2_dept"></span></td><td colspan="3"></td></tr><tr><td colspan="12" class="gray-bg">İŞ DENEYİMLERİ</td></tr><tr style="text-align:center;"><td colspan="2">BAŞLANGIÇ</td><td colspan="2">BİTİŞ</td><td colspan="3">İŞ VEREN</td><td colspan="3">POZİSYON</td><td colspan="2">ÜLKE</td></tr><tr><td colspan="2"><span class="user-input" id="out_exp1_start"></span></td><td colspan="2"><span class="user-input" id="out_exp1_end"></span></td><td colspan="3"><span class="user-input" id="out_exp1_comp"></span></td><td colspan="3"><span class="user-input" id="out_exp1_pos"></span></td><td colspan="2"></td></tr><tr><td colspan="2"></td><td colspan="2"></td><td colspan="3"><span class="user-input" id="out_exp2_comp"></span></td><td colspan="3"><span class="user-input" id="out_exp2_pos"></span></td><td colspan="2"></td></tr><tr><td colspan="12" class="gray-bg">DİL VE YETENEKLER</td></tr><tr style="text-align:center;"><td colspan="2">DİL</td><td colspan="2">KONUŞMA</td><td colspan="2">OKUMA</td><td colspan="2">YAZMA</td><td colspan="4">YETENEKLER</td></tr><tr><td colspan="2"><span class="user-input" id="out_lang1_name"></span></td><td colspan="2"><span class="user-input" id="out_lang1_lvl"></span></td><td colspan="2"></td><td colspan="2"></td><td colspan="4" rowspan="2" style="vertical-align:top;"><span class="user-input" id="out_skills"></span></td></tr><tr><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td></tr><tr><td colspan="12" class="gray-bg">DİĞER BİLGİLER</td></tr><tr><td colspan="3">SABIKA KAYDI</td><td colspan="9"><span class="user-input" id="out_sabika"></span></td></tr><tr><td colspan="3">SAĞLIK</td><td colspan="9"><span class="user-input" id="out_hastalik"></span></td></tr><tr><td colspan="12" class="gray-bg">KURSLAR</td></tr><tr><td colspan="12" style="height:20px;"></td></tr><tr><td colspan="12" style="height:20px;"></td></tr>
+                    <tr><td colspan="4" rowspan="2" class="logo-cell" style="width:30%;"><img src="ngs.png" class="logo-img"><div style="font-size:7px; color:#0056b3; font-weight:bold; text-align:center;">İNSAN KAYNAKLARI</div></td><td colspan="4" class="header-title">İŞ BAŞVURU FORMU</td><td colspan="2" rowspan="2" class="logo-cell" style="width:20%;"><img src="ngs1.png" class="logo-img"></td><td colspan="2" rowspan="9" class="photo-area" style="width:20%;"><img id="out_photo_img" src=""><span id="p_txt" style="display:block; margin-top:50px; font-size:10px;">FOTO</span></td></tr><tr></tr><tr><td colspan="10" style="font-size:8px; font-weight:bold;">1. Lütfen başvurunuza tam boyutlu fotoğrafınızı ekleyin.<br>2. Lütfen başvurduğunuz pozisyonu belirtiniz.</td></tr><tr><td colspan="3">BAŞVURULAN POZİSYON</td><td colspan="7"><span class="user-input" id="out_pozisyon"></span></td></tr><tr><td colspan="10" class="gray-bg">KİŞİSEL BİLGİLER</td></tr><tr><td colspan="2">ADI</td><td colspan="3"><span class="user-input" id="out_ad"></span></td><td colspan="2">SOYADI</td><td colspan="3"><span class="user-input" id="out_soyad"></span></td></tr><tr><td colspan="2">BOY-KİLO</td><td colspan="3"><span class="user-input" id="out_boy_kilo"></span></td><td colspan="2">UYRUĞU</td><td colspan="3"><span class="user-input" id="out_uyruk"></span></td></tr><tr><td colspan="2">TELEFON</td><td colspan="3"><span class="user-input" id="out_tel"></span></td><td colspan="2">E-MAIL</td><td colspan="3"><span class="user-input" id="out_email"></span></td></tr><tr><td colspan="2">ANNE ADI</td><td colspan="3"><span class="user-input" id="out_anne"></span></td><td colspan="2">BABA ADI</td><td colspan="3"><span class="user-input" id="out_baba"></span></td></tr><tr><td colspan="2">MEDENİ DURUM</td><td colspan="3"><span class="user-input" id="out_medeni"></span></td><td colspan="2">DOĞUM YERİ</td><td colspan="2"><span class="user-input" id="out_dogum_yeri"></span></td><td style="font-size:8px;">DOĞUM TARİHİ</td><td><span class="user-input" id="out_dogum_tarih"></span></td></tr><tr><td colspan="2">ADRES</td><td colspan="10"><span class="user-input" id="out_adres"></span></td></tr><tr><td colspan="2" style="font-size:8px;">EVLİ İSE EŞİNİN ADI...</td><td colspan="10"><span class="user-input" id="out_es"></span></td></tr><tr><td colspan="12" class="gray-bg">EĞİTİM</td></tr><tr style="text-align:center;"><td colspan="3">BİTİŞ TARİHİ</td><td colspan="3">OKUL</td><td colspan="3">BÖLÜM</td><td colspan="3">ÜLKE</td></tr><tr><td colspan="3"><span class="user-input" id="out_edu1_date"></span></td><td colspan="3"><span class="user-input" id="out_edu1_school"></span></td><td colspan="3"><span class="user-input" id="out_edu1_dept"></span></td><td colspan="3"><span class="user-input" id="out_edu1_country"></span></td></tr><tr><td colspan="3"></td><td colspan="3"><span class="user-input" id="out_edu2_school"></span></td><td colspan="3"><span class="user-input" id="out_edu2_dept"></span></td><td colspan="3"></td></tr><tr><td colspan="12" class="gray-bg">İŞ DENEYİMLERİ</td></tr><tr style="text-align:center;"><td colspan="2">BAŞLANGIÇ</td><td colspan="2">BİTİŞ</td><td colspan="3">İŞ VEREN</td><td colspan="3">POZİSYON</td><td colspan="2">ÜLKE</td></tr><tr><td colspan="2"><span class="user-input" id="out_exp1_start"></span></td><td colspan="2"><span class="user-input" id="out_exp1_end"></span></td><td colspan="3"><span class="user-input" id="out_exp1_comp"></span></td><td colspan="3"><span class="user-input" id="out_exp1_pos"></span></td><td colspan="2"></td></tr><tr><td colspan="2"></td><td colspan="2"></td><td colspan="3"><span class="user-input" id="out_exp2_comp"></span></td><td colspan="3"><span class="user-input" id="out_exp2_pos"></span></td><td colspan="2"></td></tr><tr><td colspan="12" class="gray-bg">DİL VE YETENEKLER</td></tr><tr style="text-align:center;"><td colspan="2">DİL</td><td colspan="2">KONUŞMA</td><td colspan="2">OKUMA</td><td colspan="2">YAZMA</td><td colspan="4">YETENEKLER</td></tr><tr><td colspan="2"><span class="user-input" id="out_lang1_name"></span></td><td colspan="2"><span class="user-input" id="out_lang1_lvl"></span></td><td colspan="2"></td><td colspan="2"></td><td colspan="4" rowspan="2" style="vertical-align:top;"><span class="user-input" id="out_skills"></span></td></tr><tr><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td></tr><tr><td colspan="12" class="gray-bg">DİĞER BİLGİLER</td></tr><tr><td colspan="3">SABIKA KAYDI</td><td colspan="9"><span class="user-input" id="out_sabika"></span></td></tr><tr><td colspan="3">SAĞLIK</td><td colspan="9"><span class="user-input" id="out_hastalik"></span></td></tr><tr><td colspan="12" class="gray-bg">KURSLAR</td></tr><tr><td colspan="12" style="height:20px;"></td></tr><tr><td colspan="12" style="height:20px;"></td></tr>
                 </table>
-                <div style="font-size:8px; margin-top:5px; text-align:justify;">Bu formda tarafımdan sağlanan bilgilerin eksiksiz ve doğru olduğunu beyan ederim.</div>
+                <div style="font-size:8px; margin-top:5px; text-align:justify; font-weight:bold;">Bu formda tarafımdan sağlanan bilgilerin eksiksiz ve doğru olduğunu beyan ederim.</div>
                 <div class="signature-box">AD SOYAD / İMZA</div>
             </div>
             <div class="pdf-page" id="page-2"><div class="page-header">EKLER (1 / 3)</div><div class="att-container"><div class="att-big-box"><div class="att-label">1. PASAPORT</div><div class="att-content"><img id="out_passport_img"></div></div><div class="att-big-box"><div class="att-label">2. TAM BOY FOTOĞRAF</div><div class="att-content"><img id="out_fullbody_img"></div></div></div></div>
@@ -140,7 +148,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // === SİZİN KEYS ===
+        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBZM0I_QchjXgw-eAbds2nm3JvcrYPLr9A",
             authDomain: "ngs-system-97961.firebaseapp.com",
@@ -153,65 +161,73 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        
+        // GLOBAL SCOPE (CRITICAL FIX FOR ADMIN BUTTONS)
         window.allApplications = [];
+        window.loadFromFirebase = loadFromFirebase;
+        window.gatherAndPrint = gatherAndPrint;
+        window.deleteFullApp = deleteFullApp;
+        window.checkAdmin = checkAdmin;
+        window.logout = logout;
+        window.showScreen = showScreen;
 
-        window.checkAdmin = function() {
+        function checkAdmin() {
             if(sessionStorage.getItem('isAdmin') === 'true') { showScreen('admin-screen'); loadFromFirebase(); return; }
             const pass = prompt("Yönetici Şifresi:");
             if(pass === "admin123") { sessionStorage.setItem('isAdmin', 'true'); showScreen('admin-screen'); loadFromFirebase(); } 
             else { alert("Hatalı Şifre!"); }
-        };
-        window.logout = function() { sessionStorage.removeItem('isAdmin'); showScreen('client-screen'); };
-        window.showScreen = function(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen')); document.getElementById(screenId).classList.add('active-screen'); };
+        }
+        function logout() { sessionStorage.removeItem('isAdmin'); showScreen('client-screen'); }
+        function showScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen')); document.getElementById(screenId).classList.add('active-screen'); }
 
-        // --- BAŞVURU GÖNDERME (7 Parçaya Bölerek) ---
+        // --- SUBMIT ---
         document.getElementById('submitBtn').addEventListener('click', async () => {
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerText = "Yükleniyor (Parçalı Gönderim)...";
+            btn.innerText = "Yükleniyor... Lütfen bekleyiniz.";
 
             try {
-                // Ortak ID
                 const submissionId = Date.now().toString() + Math.floor(Math.random()*1000);
                 const dateStr = new Date().toLocaleDateString('tr-TR');
-
-                // 1. Ana Bilgiler
+                
+                // Collect Text
                 const textIds = ['in_pozisyon', 'in_ad', 'in_soyad', 'in_boy_kilo', 'in_uyruk', 'in_tel', 'in_email', 'in_anne', 'in_baba', 'in_medeni', 'in_dogum_yeri', 'in_dogum_tarih', 'in_adres', 'in_es', 'in_edu1_school', 'in_edu1_dept', 'in_edu1_country', 'in_edu1_date', 'in_edu2_school', 'in_edu2_dept', 'in_exp1_comp', 'in_exp1_pos', 'in_exp1_start', 'in_exp1_end', 'in_exp2_comp', 'in_exp2_pos', 'in_lang1_name', 'in_lang1_lvl', 'in_skills', 'in_sabika', 'in_hastalik'];
                 let mainData = {};
                 textIds.forEach(id => mainData[id] = document.getElementById(id).value);
+                
                 await addDoc(collection(db, "app_main"), { submissionId, date: dateStr, data: mainData });
 
-                // 2. Belgeler (Her biri ayrı doküman - Limit aşmamak için)
-                const saveDoc = async (colName, fileId, type) => {
-                    const file = document.getElementById(fileId).files[0];
-                    const dataArr = await handleFile(file, type);
-                    if(dataArr) {
-                        await addDoc(collection(db, colName), { submissionId, img: dataArr });
+                // Helper for parts
+                const savePart = async (col, fileId, type) => {
+                    const f = document.getElementById(fileId).files[0];
+                    if(f) {
+                        const imgData = await handleFile(f, type);
+                        if(imgData) await addDoc(collection(db, col), { submissionId, img: imgData });
                     }
                 };
 
-                await saveDoc("app_photo", 'in_photo', 'photo');       // Vesikalık
-                await saveDoc("app_pass", 'in_passport_img', 'doc');   // Pasaport (Yüksek Kalite)
-                await saveDoc("app_full", 'in_fullbody_img', 'photo'); // Tam Boy
-                await saveDoc("app_dip1", 'in_diploma_img', 'doc');    // Diploma 1 (Yüksek Kalite)
-                await saveDoc("app_dip2", 'in_diploma2_img', 'doc');   // Diploma 2 (Yüksek Kalite)
-                await saveDoc("app_driver", 'in_driver_img', 'doc');   // Ehliyet (Yüksek Kalite)
-                await saveDoc("app_cert", 'in_cert_img', 'doc');       // Sertifika (Yüksek Kalite)
+                await savePart("app_photo", "in_photo", "photo");
+                await savePart("app_pass", "in_passport_img", "doc");
+                await savePart("app_full", "in_fullbody_img", "photo");
+                await savePart("app_dip1", "in_diploma_img", "doc");
+                await savePart("app_dip2", "in_diploma2_img", "doc");
+                await savePart("app_driver", "in_driver_img", "doc");
+                await savePart("app_cert", "in_cert_img", "doc");
 
-                alert("✅ Başvuru Başarıyla (Parçalı Olarak) Kaydedildi!");
+                alert("✅ Başvuru Başarıyla Kaydedildi!");
                 document.getElementById('appForm').reset();
 
-            } catch (e) {
+            } catch(e) {
                 console.error(e);
-                alert("Hata: " + e.message);
+                alert("HATA: " + e.message + "\nLütfen internet bağlantınızı kontrol edin.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "BAŞVURUYU GÖNDER";
             }
         });
 
-        // --- YÜKLEME (Sadece Ana Listeyi Çek) ---
-        window.loadFromFirebase = async function() {
+        // --- LOAD ---
+        async function loadFromFirebase() {
             const tbody = document.getElementById('admin-table-body');
             tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Yükleniyor...</td></tr>';
             window.allApplications = [];
@@ -220,80 +236,86 @@
                 const q = query(collection(db, "app_main"));
                 const querySnapshot = await getDocs(q);
                 tbody.innerHTML = '';
-                if(querySnapshot.empty) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Kayıt Yok.</td></tr>'; return; }
+                
+                if(querySnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Henüz başvuru yok.</td></tr>';
+                    return;
+                }
 
                 querySnapshot.forEach((doc) => {
                     const app = doc.data();
                     window.allApplications.push(app);
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${app.date}</td><td>${app.data.in_ad} ${app.data.in_soyad}</td><td>${app.data.in_pozisyon}</td>
-                        <td><button class="action-btn" onclick="gatherAndPrint('${app.submissionId}')">PDF İNDİR</button> 
-                        <button class="delete-btn" onclick="deleteFullApp('${app.submissionId}')">SİL</button></td>`;
+                    tr.innerHTML = `<td>${app.date}</td><td><strong>${app.data.in_ad} ${app.data.in_soyad}</strong></td><td>${app.data.in_pozisyon}</td>
+                        <td>
+                            <button class="action-btn" onclick="gatherAndPrint('${app.submissionId}')">PDF İNDİR</button> 
+                            <button class="delete-btn" onclick="deleteFullApp('${app.submissionId}')">SİL</button>
+                        </td>`;
                     tbody.appendChild(tr);
                 });
             } catch(e) {
                 console.error(e);
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Veri çekilemedi.</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">HATA: Veri çekilemedi.<br>${e.message}</td></tr>`;
             }
-        };
+        }
 
-        // --- VERİLERİ TOPLA VE PDF YAP ---
-        window.gatherAndPrint = async function(submissionId) {
-            const btn = document.activeElement;
-            const oldText = btn.innerText;
-            btn.innerText = "Parçalar Toplanıyor...";
-            btn.disabled = true;
+        // --- GATHER & PRINT ---
+        async function gatherAndPrint(submissionId) {
+            const btn = document.activeElement; 
+            if(btn) { btn.innerText = "İşleniyor..."; btn.disabled = true; }
 
             try {
                 const mainApp = window.allApplications.find(a => a.submissionId === submissionId);
+                if(!mainApp) throw new Error("Başvuru verisi bulunamadı.");
+
                 let finalData = { ...mainApp.data };
 
-                // Yardımcı Fonksiyon: Tek bir parçayı çek
-                const fetchPart = async (colName, keyName) => {
-                    const q = query(collection(db, colName), where("submissionId", "==", submissionId));
+                // Fetch parts
+                const fetchP = async (col, key) => {
+                    const q = query(collection(db, col), where("submissionId", "==", submissionId));
                     const snap = await getDocs(q);
-                    snap.forEach(d => { finalData[keyName] = d.data().img; });
+                    snap.forEach(d => finalData[key] = d.data().img);
                 };
 
-                // Tüm parçaları paralel çek
                 await Promise.all([
-                    fetchPart("app_photo", "photo"),
-                    fetchPart("app_pass", "passport"),
-                    fetchPart("app_full", "fullbody"),
-                    fetchPart("app_dip1", "diploma"),
-                    fetchPart("app_dip2", "diploma2"),
-                    fetchPart("app_driver", "driver"),
-                    fetchPart("app_cert", "cert")
+                    fetchP("app_photo", "photo"), fetchP("app_pass", "passport"),
+                    fetchP("app_full", "fullbody"), fetchP("app_dip1", "diploma"),
+                    fetchP("app_dip2", "diploma2"), fetchP("app_driver", "driver"),
+                    fetchP("app_cert", "cert")
                 ]);
 
                 generatePDF(finalData, mainApp.date);
 
             } catch(e) {
-                alert("Hata: " + e.message);
+                alert("PDF Hatası: " + e.message);
             } finally {
-                btn.innerText = oldText;
-                btn.disabled = false;
+                if(btn) { btn.innerText = "PDF İNDİR"; btn.disabled = false; }
             }
-        };
+        }
 
-        // --- SİLME (Tüm Parçaları Sil) ---
-        window.deleteFullApp = async function(submissionId) {
-            if(!confirm("Bu kaydı ve tüm belgelerini silmek istiyor musunuz?")) return;
-            const collections = ["app_main", "app_photo", "app_pass", "app_full", "app_dip1", "app_dip2", "app_driver", "app_cert"];
+        // --- DELETE ---
+        async function deleteFullApp(submissionId) {
+            if(!confirm("DİKKAT: Bu kaydı ve tüm resimleri kalıcı olarak silmek istiyor musunuz?")) return;
+            
             try {
-                for(const col of collections) {
+                const cols = ["app_main", "app_photo", "app_pass", "app_full", "app_dip1", "app_dip2", "app_driver", "app_cert"];
+                for(const col of cols) {
                     const q = query(collection(db, col), where("submissionId", "==", submissionId));
                     const snap = await getDocs(q);
-                    const batch = writeBatch(db);
-                    snap.forEach(doc => batch.delete(doc.ref));
-                    await batch.commit();
+                    // Delete one by one to ensure safety without batch limits
+                    const deletePromises = [];
+                    snap.forEach(doc => deletePromises.push(deleteDoc(doc.ref)));
+                    await Promise.all(deletePromises);
                 }
                 loadFromFirebase();
-            } catch(e) { alert("Silme hatası: " + e.message); }
-        };
+                alert("Kayıt başarıyla silindi.");
+            } catch(e) {
+                alert("Silme Hatası: " + e.message);
+            }
+        }
 
-        // --- GÖRÜNTÜ İŞLEME (Type: 'doc' = HD, 'photo' = SD) ---
-        async function handleFile(file, type = 'photo') {
+        // --- PROCESSING ---
+        async function handleFile(file, type) {
             if (!file) return null;
             if (file.type.startsWith('image/')) return compressImage(file, type);
             if (file.type === 'application/pdf') return convertPdfToImages(file, type);
@@ -309,9 +331,7 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        // Doc: 1600px & 0.85 Quality (HD)
-                        // Photo: 800px & 0.6 Quality (SD)
-                        const MAX = (type === 'doc') ? 1600 : 800;
+                        const MAX = (type === 'doc') ? 1600 : 800; 
                         const QUAL = (type === 'doc') ? 0.85 : 0.6;
                         let w = img.width, h = img.height;
                         if(w>h) { if(w>MAX){ h*=MAX/w; w=MAX; }} else { if(h>MAX){ w*=MAX/h; h=MAX; }}
@@ -329,10 +349,8 @@
             const pdf = await pdfjsLib.getDocument(arr).promise;
             const images = [];
             const max = Math.min(pdf.numPages, 1);
-            // Doc: Scale 2.0 (HD)
             const scale = (type === 'doc') ? 2.0 : 1.0;
             const qual = (type === 'doc') ? 0.85 : 0.6;
-
             for(let i=1; i<=max; i++){
                 const page = await pdf.getPage(i);
                 const vp = page.getViewport({scale: scale});
@@ -364,11 +382,12 @@
             }
             document.getElementById('out_today').innerText = dateStr;
 
-            // Clear & Fill
+            // Clear
             const clear = (id) => { const el=document.getElementById(id); if(el.tagName=='IMG') el.src=''; else el.innerHTML=''; };
             clear('out_photo_img'); document.getElementById('out_photo_img').style.display='none'; document.getElementById('p_txt').style.display='block';
             ['out_passport_img','out_fullbody_img','out_driver_img','out_diploma_container','out_diploma2_container','out_cert_container'].forEach(clear);
 
+            // Fill
             const setImg = (id, arr) => { if(arr && arr[0]) { document.getElementById(id).src = arr[0]; } };
             const setCont = (id, arr) => { if(arr && arr[0]) { const i = document.createElement('img'); i.src = arr[0]; document.getElementById(id).appendChild(i); } };
 
@@ -380,11 +399,12 @@
             setCont('out_diploma2_container', data.diploma2);
             setCont('out_cert_container', data.cert);
 
+            // High Quality Render
             const opt = { 
                 margin: 0, 
                 filename: `Basvuru_${data.in_ad}.pdf`, 
                 image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 4, useCORS: true }, 
+                html2canvas: { scale: 3, useCORS: true }, 
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
             };
             html2pdf().set(opt).from(document.getElementById('print-container')).save();
