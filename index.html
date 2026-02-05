@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NGS İK (Hizalama Düzeltildi)</title>
+    <title>NGS İK (Kusursuz Baskı)</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
@@ -34,57 +34,51 @@
         .action-btn { background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px; }
         .delete-btn { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
 
-        /* --- PDF GENERATOR STYLES (FIXED ALIGNMENT) --- */
-        #pdf-generator-zone { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            z-index: -1000; 
-            visibility: hidden; /* Use visibility instead of left: -9999px to prevent shift */
-        }
+        /* --- PDF GENERATOR STYLES --- */
+        #pdf-generator-zone { position: absolute; top: 0; left: 0; z-index: -1000; visibility: hidden; }
         
         .pdf-page { 
             width: 210mm; 
-            height: 297mm; /* Exact A4 height */
+            height: 296mm; /* Safe Height (A4 is 297mm) */
             padding: 10mm; 
             background: white; 
             position: relative; 
             overflow: hidden; 
             box-sizing: border-box; 
-            page-break-after: always;
             display: flex;
             flex-direction: column;
-            margin: 0 auto; /* Center internally */
+            margin: 0 auto;
+            page-break-after: always; /* Force break after each page */
+        }
+
+        /* FIX: Remove break from the very last page to prevent blank end page */
+        .pdf-page:last-child {
+            page-break-after: avoid !important;
         }
         
-        /* PAGE 1 TABLE (FIXED WIDTH) */
-        table.pdf-table { 
-            width: 100%; /* Fills the 190mm content area */
-            border-collapse: collapse; 
-            border: 2px solid black; 
-            table-layout: fixed; 
-        }
-        table.pdf-table td { 
-            border: 1px solid black; 
-            padding: 4px; 
-            font-size: 10px; 
-            font-weight: bold; 
-            vertical-align: middle; 
-            height: 18px; 
-            overflow: hidden; 
-            white-space: nowrap; 
-            color: #000; 
-        }
+        /* Page 1 Table */
+        table.pdf-table { width: 100%; border-collapse: collapse; border: 2px solid black; table-layout: fixed; }
+        table.pdf-table td { border: 1px solid black; padding: 4px; font-size: 10px; font-weight: bold; vertical-align: middle; height: 18px; overflow: hidden; white-space: nowrap; color: #000; }
         .gray-bg { background-color: #d0cece; text-align: center; }
         .photo-area { background-color: white; text-align: center; vertical-align: top !important; padding: 0; }
         .user-input { font-weight: 900; font-family: 'Arial', sans-serif; text-transform: uppercase; margin-left: 5px; font-size: 11px; color: #000; }
         .logo-img { height: 35px; display: block; margin: auto; }
         #out_photo_img { width: 100%; height: 150px; object-fit: cover; }
 
-        /* ATTACHMENTS (FIXED LAYOUT) */
+        /* ATTACHMENTS (Clean & Fixed) */
         .page-header { text-align:center; font-weight:bold; font-size:16px; border-bottom:2px solid black; margin-bottom:15px; padding-bottom:5px; color: #000; }
         .att-container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 20px; padding-bottom: 20px; }
-        .att-big-box { flex: 1; border: none; display: flex; flex-direction: column; background: white; overflow: hidden; position: relative; }
+        
+        .att-big-box { 
+            flex: 1; 
+            border: none; 
+            display: flex; 
+            flex-direction: column; 
+            background: white; 
+            overflow: hidden; 
+            position: relative; 
+        }
+
         .att-label { background: white; font-size: 14px; font-weight: 900; padding: 5px 0; text-align: left; border-bottom: 2px solid #000; color: #000; margin-bottom: 10px; flex-shrink: 0; }
         .att-content { flex-grow: 1; position: relative; width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .att-content img { max-width: 98%; max-height: 98%; width: auto; height: auto; object-fit: contain; display: block; }
@@ -93,7 +87,7 @@
 <body>
 
     <div class="navbar">
-        <div class="nav-brand">NGS İK (Hizalama Fix)</div>
+        <div class="nav-brand">NGS İK (No Empty Pages)</div>
         <div>
             <button class="nav-btn" onclick="showScreen('client-screen')">Form</button>
             <button class="nav-btn" onclick="checkAdmin()">Admin</button>
@@ -412,7 +406,7 @@
             setCont('out_cert_container', data.cert);
 
             // --- CRITICAL FIX: RESET COORDINATES ---
-            document.getElementById('pdf-generator-zone').style.visibility = "visible"; // Make visible to capture
+            document.getElementById('pdf-generator-zone').style.visibility = "visible"; 
             
             const opt = { 
                 margin: 0, 
@@ -421,14 +415,14 @@
                 html2canvas: { 
                     scale: 3, 
                     useCORS: true,
-                    scrollX: 0, // FORCE TOP-LEFT
-                    scrollY: 0  // FORCE TOP-LEFT
+                    scrollX: 0, 
+                    scrollY: 0
                 }, 
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
             };
             
             html2pdf().set(opt).from(document.getElementById('print-container')).save().then(() => {
-                 document.getElementById('pdf-generator-zone').style.visibility = "hidden"; // Hide again
+                 document.getElementById('pdf-generator-zone').style.visibility = "hidden";
             });
         }
     </script>
