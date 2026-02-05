@@ -3,71 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NGS İK (Admin Onarım)</title>
+    <title>NGS İK (Hizalama Düzeltildi)</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';</script>
 
     <style>
-        body { font-family: 'Arial', sans-serif; background: #f4f6f9; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
-        .navbar { background: #1a252f; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .nav-brand { font-weight: bold; font-size: 1.2rem; letter-spacing: 0.5px; }
-        .nav-btn { background: #34495e; border: 1px solid #5d6d7e; color: white; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-size: 0.9rem; transition: 0.2s; }
-        .nav-btn:hover { background: #2c3e50; }
-        
-        .screen { display: none; padding: 20px; height: 100%; box-sizing: border-box; overflow-y: auto; }
-        .active-screen { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity:0; transform: translateY(5px); } to { opacity:1; transform: translateY(0); } }
-
-        .form-container, .admin-container { max-width: 900px; margin: 0 auto; background: white; padding: 35px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-        
-        /* Form & Admin */
-        .section-header { background: #eef2f7; padding: 12px; font-weight: bold; color: #2c3e50; border-left: 5px solid #3498db; margin-top: 30px; margin-bottom: 20px; text-transform: uppercase; font-size: 0.95rem; }
+        /* --- GLOBAL STYLES --- */
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        .navbar { background: #2c3e50; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .nav-brand { font-weight: bold; font-size: 1.1rem; }
+        .nav-btn { background: #34495e; border: 1px solid #7f8c8d; color: white; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-size: 0.9rem; }
+        .screen { display: none; padding: 15px; height: 100%; box-sizing: border-box; overflow-y: auto; }
+        .active-screen { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        .form-container, .admin-container { max-width: 850px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .section-header { background: #f8f9fa; padding: 10px; font-weight: bold; color: #2c3e50; border-left: 5px solid #0056b3; margin-top: 25px; margin-bottom: 15px; text-transform: uppercase; font-size: 0.9rem; }
         .form-row { display: flex; gap: 20px; margin-bottom: 15px; }
         .form-group { flex: 1; display: flex; flex-direction: column; }
-        label { font-size: 0.9rem; font-weight: 700; color: #444; margin-bottom: 8px; }
-        input[type="text"], input[type="date"], select { padding: 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1rem; width: 100%; box-sizing: border-box; transition: 0.3s; }
-        input[type="file"] { padding: 10px; background: #f8f9fa; border: 2px dashed #ced4da; border-radius: 6px; width: 100%; box-sizing: border-box; }
-        
-        .submit-btn { width: 100%; padding: 16px; background: #27ae60; color: white; font-weight: bold; border: none; cursor: pointer; font-size: 1.1rem; margin-top: 35px; border-radius: 6px; transition: 0.2s; }
-        .submit-btn:hover { background: #219150; }
+        label { font-size: 0.85rem; font-weight: 600; color: #555; margin-bottom: 6px; }
+        input[type="text"], input[type="date"], select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; width: 100%; box-sizing: border-box; }
+        input[type="file"] { padding: 10px; background: #f9f9f9; border: 1px dashed #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 15px; background: #27ae60; color: white; font-weight: bold; border: none; cursor: pointer; font-size: 1.1rem; margin-top: 30px; border-radius: 6px; }
         .submit-btn:disabled { background: #95a5a6; cursor: wait; }
+        @media (max-width: 768px) { .form-row { flex-direction: column; gap: 15px; } .form-container { padding: 15px; margin-top: 10px; } }
+        table.admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
+        table.admin-table th { background: #34495e; color: white; padding: 10px; text-align: left; }
+        table.admin-table td { padding: 10px; border-bottom: 1px solid #eee; }
+        .action-btn { background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px; }
+        .delete-btn { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
 
-        @media (max-width: 768px) { .form-row { flex-direction: column; gap: 15px; } .form-container { padding: 20px; } }
-
-        /* Admin Table */
-        table.admin-table { width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 0.95rem; }
-        table.admin-table th { background: #2c3e50; color: white; padding: 12px; text-align: left; border-radius: 5px 5px 0 0; }
-        table.admin-table td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
-        .action-btn { background: #3498db; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px; font-size: 0.85rem; }
-        .delete-btn { background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
-
-        /* PDF Styles - CLEAN DESIGN */
-        #pdf-generator-zone { position: absolute; left: -9999px; top: 0; }
-        .pdf-page { width: 210mm; height: 296mm; padding: 10mm; background: white; position: relative; overflow: hidden; box-sizing: border-box; page-break-after: always; display: flex; flex-direction: column; }
+        /* --- PDF GENERATOR STYLES (FIXED ALIGNMENT) --- */
+        #pdf-generator-zone { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            z-index: -1000; 
+            visibility: hidden; /* Use visibility instead of left: -9999px to prevent shift */
+        }
         
-        table.pdf-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; }
-        table.pdf-table td { border: 1px solid #000; padding: 4px; font-size: 10px; font-weight: 700; vertical-align: middle; height: 18px; overflow: hidden; white-space: nowrap; color: #000; font-family: 'Arial', sans-serif; }
+        .pdf-page { 
+            width: 210mm; 
+            height: 297mm; /* Exact A4 height */
+            padding: 10mm; 
+            background: white; 
+            position: relative; 
+            overflow: hidden; 
+            box-sizing: border-box; 
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
+            margin: 0 auto; /* Center internally */
+        }
+        
+        /* PAGE 1 TABLE (FIXED WIDTH) */
+        table.pdf-table { 
+            width: 100%; /* Fills the 190mm content area */
+            border-collapse: collapse; 
+            border: 2px solid black; 
+            table-layout: fixed; 
+        }
+        table.pdf-table td { 
+            border: 1px solid black; 
+            padding: 4px; 
+            font-size: 10px; 
+            font-weight: bold; 
+            vertical-align: middle; 
+            height: 18px; 
+            overflow: hidden; 
+            white-space: nowrap; 
+            color: #000; 
+        }
         .gray-bg { background-color: #d0cece; text-align: center; }
         .photo-area { background-color: white; text-align: center; vertical-align: top !important; padding: 0; }
         .user-input { font-weight: 900; font-family: 'Arial', sans-serif; text-transform: uppercase; margin-left: 5px; font-size: 11px; color: #000; }
         .logo-img { height: 35px; display: block; margin: auto; }
         #out_photo_img { width: 100%; height: 150px; object-fit: cover; }
 
-        /* Attachment Page (No Borders, Clean) */
-        .page-header { text-align:center; font-weight:900; font-size:18px; border-bottom:3px solid #000; margin-bottom:20px; padding-bottom:5px; color: #000; }
+        /* ATTACHMENTS (FIXED LAYOUT) */
+        .page-header { text-align:center; font-weight:bold; font-size:16px; border-bottom:2px solid black; margin-bottom:15px; padding-bottom:5px; color: #000; }
         .att-container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 20px; padding-bottom: 20px; }
         .att-big-box { flex: 1; border: none; display: flex; flex-direction: column; background: white; overflow: hidden; position: relative; }
         .att-label { background: white; font-size: 14px; font-weight: 900; padding: 5px 0; text-align: left; border-bottom: 2px solid #000; color: #000; margin-bottom: 10px; flex-shrink: 0; }
         .att-content { flex-grow: 1; position: relative; width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .att-content img { max-width: 98%; max-height: 98%; width: auto; height: auto; object-fit: contain; display: block; box-shadow: none; border: none; }
+        .att-content img { max-width: 98%; max-height: 98%; width: auto; height: auto; object-fit: contain; display: block; }
     </style>
 </head>
 <body>
 
     <div class="navbar">
-        <div class="nav-brand">NGS İK (Admin Fix)</div>
+        <div class="nav-brand">NGS İK (Hizalama Fix)</div>
         <div>
             <button class="nav-btn" onclick="showScreen('client-screen')">Form</button>
             <button class="nav-btn" onclick="checkAdmin()">Admin</button>
@@ -101,7 +127,7 @@
                 <div class="form-group"><label>Yetenekler</label><input type="text" id="in_skills"></div>
                 <div class="form-group"><label>Sabıka Kaydı</label><input type="text" id="in_sabika"></div>
                 <div class="form-group"><label>Kronik Hastalık</label><input type="text" id="in_hastalik"></div>
-                <div class="section-header" style="background:#fff3cd; border-left-color:#ffc107;">5. Belge Yükleme (Kalın & Net)</div>
+                <div class="section-header" style="background:#fff3cd; border-left-color:#ffc107;">5. Belge Yükleme (HD Kalite)</div>
                 <div class="form-row"><div class="form-group"><label>1. Pasaport</label><input type="file" id="in_passport_img" accept="image/*"></div><div class="form-group"><label>2. Tam Boy Foto</label><input type="file" id="in_fullbody_img" accept="image/*"></div></div>
                 <div class="form-row"><div class="form-group"><label>3. Diploma (Lise 1)</label><input type="file" id="in_diploma_img" accept="image/*, application/pdf"></div><div class="form-group"><label>4. Lise 2 / Transkript</label><input type="file" id="in_diploma2_img" accept="image/*, application/pdf"></div></div>
                 <div class="form-row"><div class="form-group"><label>5. Ehliyet</label><input type="file" id="in_driver_img" accept="image/*"></div><div class="form-group"><label>6. Sertifika</label><input type="file" id="in_cert_img" accept="image/*, application/pdf"></div></div>
@@ -115,7 +141,7 @@
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h2>Yönetici Paneli</h2>
                 <div>
-                    <button onclick="loadFromFirebase()" style="background:#3498db; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:4px; font-weight:bold;">YENİLE</button>
+                    <button onclick="loadFromFirebase()" style="background:#3498db; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:4px;">YENİLE</button>
                     <button onclick="logout()" style="background:#95a5a6; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:4px;">ÇIKIŞ</button>
                 </div>
             </div>
@@ -148,7 +174,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIG
+        // KEYS
         const firebaseConfig = {
             apiKey: "AIzaSyBZM0I_QchjXgw-eAbds2nm3JvcrYPLr9A",
             authDomain: "ngs-system-97961.firebaseapp.com",
@@ -162,7 +188,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // GLOBAL SCOPE (CRITICAL FIX FOR ADMIN BUTTONS)
         window.allApplications = [];
         window.loadFromFirebase = loadFromFirebase;
         window.gatherAndPrint = gatherAndPrint;
@@ -190,14 +215,12 @@
                 const submissionId = Date.now().toString() + Math.floor(Math.random()*1000);
                 const dateStr = new Date().toLocaleDateString('tr-TR');
                 
-                // Collect Text
                 const textIds = ['in_pozisyon', 'in_ad', 'in_soyad', 'in_boy_kilo', 'in_uyruk', 'in_tel', 'in_email', 'in_anne', 'in_baba', 'in_medeni', 'in_dogum_yeri', 'in_dogum_tarih', 'in_adres', 'in_es', 'in_edu1_school', 'in_edu1_dept', 'in_edu1_country', 'in_edu1_date', 'in_edu2_school', 'in_edu2_dept', 'in_exp1_comp', 'in_exp1_pos', 'in_exp1_start', 'in_exp1_end', 'in_exp2_comp', 'in_exp2_pos', 'in_lang1_name', 'in_lang1_lvl', 'in_skills', 'in_sabika', 'in_hastalik'];
                 let mainData = {};
                 textIds.forEach(id => mainData[id] = document.getElementById(id).value);
                 
                 await addDoc(collection(db, "app_main"), { submissionId, date: dateStr, data: mainData });
 
-                // Helper for parts
                 const savePart = async (col, fileId, type) => {
                     const f = document.getElementById(fileId).files[0];
                     if(f) {
@@ -219,7 +242,7 @@
 
             } catch(e) {
                 console.error(e);
-                alert("HATA: " + e.message + "\nLütfen internet bağlantınızı kontrol edin.");
+                alert("HATA: " + e.message);
             } finally {
                 btn.disabled = false;
                 btn.innerText = "BAŞVURUYU GÖNDER";
@@ -266,11 +289,8 @@
 
             try {
                 const mainApp = window.allApplications.find(a => a.submissionId === submissionId);
-                if(!mainApp) throw new Error("Başvuru verisi bulunamadı.");
-
                 let finalData = { ...mainApp.data };
 
-                // Fetch parts
                 const fetchP = async (col, key) => {
                     const q = query(collection(db, col), where("submissionId", "==", submissionId));
                     const snap = await getDocs(q);
@@ -293,28 +313,21 @@
             }
         }
 
-        // --- DELETE ---
         async function deleteFullApp(submissionId) {
-            if(!confirm("DİKKAT: Bu kaydı ve tüm resimleri kalıcı olarak silmek istiyor musunuz?")) return;
-            
+            if(!confirm("DİKKAT: Silmek istediğinize emin misiniz?")) return;
             try {
                 const cols = ["app_main", "app_photo", "app_pass", "app_full", "app_dip1", "app_dip2", "app_driver", "app_cert"];
                 for(const col of cols) {
                     const q = query(collection(db, col), where("submissionId", "==", submissionId));
                     const snap = await getDocs(q);
-                    // Delete one by one to ensure safety without batch limits
                     const deletePromises = [];
                     snap.forEach(doc => deletePromises.push(deleteDoc(doc.ref)));
                     await Promise.all(deletePromises);
                 }
                 loadFromFirebase();
-                alert("Kayıt başarıyla silindi.");
-            } catch(e) {
-                alert("Silme Hatası: " + e.message);
-            }
+            } catch(e) { alert("Silme Hatası: " + e.message); }
         }
 
-        // --- PROCESSING ---
         async function handleFile(file, type) {
             if (!file) return null;
             if (file.type.startsWith('image/')) return compressImage(file, type);
@@ -387,7 +400,6 @@
             clear('out_photo_img'); document.getElementById('out_photo_img').style.display='none'; document.getElementById('p_txt').style.display='block';
             ['out_passport_img','out_fullbody_img','out_driver_img','out_diploma_container','out_diploma2_container','out_cert_container'].forEach(clear);
 
-            // Fill
             const setImg = (id, arr) => { if(arr && arr[0]) { document.getElementById(id).src = arr[0]; } };
             const setCont = (id, arr) => { if(arr && arr[0]) { const i = document.createElement('img'); i.src = arr[0]; document.getElementById(id).appendChild(i); } };
 
@@ -399,15 +411,25 @@
             setCont('out_diploma2_container', data.diploma2);
             setCont('out_cert_container', data.cert);
 
-            // High Quality Render
+            // --- CRITICAL FIX: RESET COORDINATES ---
+            document.getElementById('pdf-generator-zone').style.visibility = "visible"; // Make visible to capture
+            
             const opt = { 
                 margin: 0, 
                 filename: `Basvuru_${data.in_ad}.pdf`, 
                 image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 3, useCORS: true }, 
+                html2canvas: { 
+                    scale: 3, 
+                    useCORS: true,
+                    scrollX: 0, // FORCE TOP-LEFT
+                    scrollY: 0  // FORCE TOP-LEFT
+                }, 
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
             };
-            html2pdf().set(opt).from(document.getElementById('print-container')).save();
+            
+            html2pdf().set(opt).from(document.getElementById('print-container')).save().then(() => {
+                 document.getElementById('pdf-generator-zone').style.visibility = "hidden"; // Hide again
+            });
         }
     </script>
 </body>
